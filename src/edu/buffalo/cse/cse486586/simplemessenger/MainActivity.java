@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.text.Html;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -22,6 +23,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnKeyListener;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -46,7 +48,9 @@ public class MainActivity extends Activity {
 		}
 		
 		TextView msgs = (TextView) findViewById(R.id.textView1);
-		msgs.append("\n");
+		String str = "<b> Incoming Messages </b>";
+		msgs.append(Html.fromHtml(str));
+		msgs.append("\n\n");
 		msgs.setBackgroundColor(Color.LTGRAY);
 		ServerSocket serverSocket = null;
 		try {
@@ -101,7 +105,8 @@ public class MainActivity extends Activity {
 			TextView msgs = (TextView) findViewById(R.id.textView1);
 			msgs.setMovementMethod(new ScrollingMovementMethod());
 			msgs.append(values[0] + '\n');
-			
+			msgs.setMovementMethod(new ScrollingMovementMethod());
+			((ScrollView) findViewById(R.id.scrollView)).fullScroll(View.FOCUS_DOWN);
 			Log.v(TAG, values[0]);
 		}
 
@@ -122,6 +127,7 @@ public class MainActivity extends Activity {
 					String clientMsg = fromClient.readLine();
 					Log.v(TAG, clientMsg);
 					publishProgress(clientMsg);
+					clientSocket.close();
 				} catch (Exception e) {
 					e.printStackTrace();
 					return null;
@@ -153,6 +159,7 @@ public class MainActivity extends Activity {
 
 				toServer = new DataOutputStream(clientSocket.getOutputStream());
 				toServer.writeBytes(message + '\n');
+				clientSocket.close();
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
